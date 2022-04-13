@@ -33,16 +33,3 @@ class tweepy_coin_crawler:
             wr.writerow([i, tweet.created_at, tweet.user.id, tweet.user.name, tweet.user.screen_name,tweet.text,tweet.retweet_count, tweet.favorite_count, tweet.user.followers_count, tweet.user.friends_count])
             
         return "twitter.csv file uploaded"
-
-import pandas as pd 
-
-token = pd.read_csv("/Users/kimjuwon/Github/Capstone_Data_Crawling/twitter_crawler/token.csv", encoding='utf-8')
-token = list(token.loc[0])
-
-coin_crawler = tweepy_coin_crawler(token[0], token[1], token[2],token[3])
-coin_crawler.tweepy_connect()
-
-location = "%s,%s,%s" % ("35.95", "-95.712891", "1000km")  # 검색기준(대한민국 중심) 좌표, 반지름  
-keyword = "bitcoin OR crypto"  
-
-print(coin_crawler.tweepy_crawler_with_7_days(location, keyword))
