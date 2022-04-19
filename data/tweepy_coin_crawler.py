@@ -20,12 +20,13 @@ class tweepy_coin_crawler:
 
     # 현재 날짜로부터 일주일 전 날짜만 입력 가능합니다.
     def tweepy_crawler_with_7_days(self, location, keyword):
-        file = open("./twitter.csv",'w', newline='')        # csv로 저장
-        wr = csv.writer(file) # twitter 검색 cursor 선언
         year = input("연도를 입력하세요(2022년이후):")
         month = input("월을 입력하세요(01~12월):")
         day = input("날짜를 입력하세요(01~31):")
         date = year+'-'+month+'-'+day
+        file_name = keyword +"_" +date
+        file = open("./"+file_name,'w', newline='')        # csv로 저장
+        wr = csv.writer(file) # twitter 검색 cursor 선언
         cursor = tweepy.Cursor(self.api.search_tweets, q=keyword, until=date, count=100, geocode=location, include_entities=True)
 
         wr.writerow(["number", "date", "user_id", "user_name", "user_screen_name", "tweet", "retweets", "likes", "follower_number", "following_number"])
