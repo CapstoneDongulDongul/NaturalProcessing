@@ -84,3 +84,5 @@ class sentimental_analysis:
             senti_analyzer.predict(test)
             twitter_flair_score.append(test.labels)
             #sentence 클래스 학습 이후 점수만 추출 예정
+    
+    #update 0419
