@@ -80,7 +80,15 @@ class sentimental_analysis:
         senti_analyzer = TextClassifier.load('en-sentiment')
         twitter_flair_score = []
         for i in range(0,len(text_list)):
-            test = str(text_list[i])
-            senti_analyzer.predict(test)
-            twitter_flair_score.append(test.labels)
+            sentence = Sentence(text_list[i])
+            senti_analyzer.predict(sentence,return_probabilities_for_all_classes=True)
+            if sentence.labels[0].score > sentence.labels[1].score:
+                twitter_flair_score.append(sentence.labels[0].score)
+            else:
+                twitter_flair_score.append((sentence.labels[1].score)*(-1))
+        for i in range(0,len(result_tweet)):
+            self.twitter_data.loc[i,'flair'] = twitter_flair_score[i]     
+    
+    def save_csv(self):
+        self.twitter_data.to_csv('senti_tweet',mode = 'w')        
             #sentence 클래스 학습 이후 점수만 추출 예정
