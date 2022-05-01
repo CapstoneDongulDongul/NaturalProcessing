@@ -34,3 +34,7 @@ class tweepy_coin_crawler:
             wr.writerow([i, tweet.created_at, tweet.user.id, tweet.user.name, tweet.user.screen_name,tweet.text,tweet.retweet_count, tweet.favorite_count, tweet.user.followers_count, tweet.user.friends_count])
             
         return "twitter.csv file uploaded"
+
+    def tweepy_connect(self):
+        self.api = None
+    
