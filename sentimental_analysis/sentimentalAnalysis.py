@@ -16,7 +16,6 @@ import time
 stop_words = stopwords.words('english')
 stemmer = PorterStemmer()
 tweet_tokenizer = TweetTokenizer()
-senti_analyzer = TextClassifier.load('en-sentiment')
 
 class sentimental_analysis:
     #데이터프레임을 입력받아 클래스초기화
@@ -70,6 +69,17 @@ class sentimental_analysis:
                 else:
                     self.twitter_data.loc[index,'clean_text'] = text
             print("process time : ",time.time()-start)
+    def sentimental_Textblob(self):
+        start=time.time()
+        result_tweet = self.twitter_data
+        text_list = list(result_tweet['clean_text'])
+        twitter_textblob_score = []
+        for i in range(len(text_list)):
+            blob = TextBlob(str(text_list[i]))
+            for sentence in blob.sentences:
+                twitter_textblob_score.append(sentence.sentiment.polarity)
+                self.twitter_data.loc[i,'textblob'] = twitter_textblob_score[i]
+        print("textblob sentimental time : ",time.time()-start)
     def sentimental_vader(self):                    
         start = time.time()
         result_tweet = self.twitter_data
