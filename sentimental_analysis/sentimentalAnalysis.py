@@ -1,4 +1,4 @@
-import nltk
+\import nltk
 import re
 import pandas as pd
 import numpy as np
@@ -23,19 +23,19 @@ class sentimental_analysis:
         self.twitter_data = twitter_data
         self.twitter_data = self.twitter_data[['date','tweet']]
         self.twitter_data['clean_text'] = np.NaN
-        self.twitter_data['vader'] = np.NaN
-        self.twitter_data['textblob'] = np.NaN
-        self.twitter_data['flair'] = np.NaN
     #vader,textblob,flair 옵션 입력
     def process(self,option): 
         start = time.time()
+        self.twitter_data['tweet'] = self.twitter_data['tweet'].astype(str)
+        self.twitter_data['clean_text'] = self.twitter_data['clean_text'].astype(str)
         #데이터 프레임 전처리 텍스트
         korean = re.compile('[\u3131-\u3163\uac00-\ud7a3]+')
         clean_tweet = []
         tweet = self.twitter_data
         if option == 'textblob':
-            for index,row in tweet.iterrows():
-                tweet_list_corpus = re.sub(korean, '', row['tweet'])
+             for i in tweet.index:
+                t = tweet._get_value(i,'tweet')
+                tweet_list_corpus = re.sub(korean, '', str(t))
                 # URL 제거
                 clear_text = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",repl= ' ', string = tweet_list_corpus) # http로 시작되는 url
                 clear_text = clear_text.replace('\n',' ').replace('\t',' ')
@@ -48,12 +48,13 @@ class sentimental_analysis:
                 word_list = [stemmer.stem(word) for word in word_list]
                 text = ' '.join(word_list)
                 if len(text) == 0:
-                    self.twitter_data.loc[index,'clean_text'] = '0'
+                    self.twitter_data._set_value(i,'clean_text','0')
                 else:
-                    self.twitter_data.loc[index,'clean_text'] = text
+                    self.twitter_data._set_value(i,'clean_text',text)
         elif option == 'vader' or option =='flair':
-            for index,row in tweet.iterrows():
-                tweet_list_corpus = re.sub(korean, '', row['tweet'])
+            for i in tweet.index:
+                t = tweet._get_value(i,'tweet')
+                tweet_list_corpus = re.sub(korean, '', str(t))
                 clear_text = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",repl= ' ', string = tweet_list_corpus) # http로 시작되는 url
                 clear_text = clear_text.replace('\n',' ').replace('\t',' ')
                 clear_text = re.sub('RT @[\w_]+: ',' ', clear_text)
@@ -63,12 +64,14 @@ class sentimental_analysis:
                 word_list = [word for word in word_list if word not in stop_words]
                 word_list = [stemmer.stem(word) for word in word_list]
                 text = ' '.join(word_list)
-                self.twitter_data.loc[index,'clean_text'] = text
-                if len(text) == 0:#전처리 결과로 문자가 모두 사라진 경우 -> 0을 대입하여 결과에 영향 X
-                    self.twitter_data.loc[index,'clean_text'] = '0'
+                if len(text) == 0:
+                    self.twitter_data._set_value(i,'clean_text','0')
                 else:
-                    self.twitter_data.loc[index,'clean_text'] = text
-            print("process time : ",time.time()-start)
+                    self.twitter_data._set_value(i,'clean_text',text)
+        self.twitter_data['vader'] = np.NaN
+        self.twitter_data['textblob'] = np.NaN
+        self.twitter_data['flair'] = np.NaN
+        print("process time : ",time.time()-start)
     def sentimental_Textblob(self):
         start=time.time()
         result_tweet = self.twitter_data
@@ -84,15 +87,14 @@ class sentimental_analysis:
         start = time.time()
         result_tweet = self.twitter_data
         #전처리된 csv파일 다시 reload
-        text_list = list(result_tweet['clean_text'])
+        text_list = result_tweet['clean_text']
         senti_analyzer = SentimentIntensityAnalyzer()
         twitter_vader_score = []
-        for i in range(0,len(text_list)):
-            test = str(text_list[i])
+        for i in result_tweet.index:
+            test = result_tweet._get_value(i,'clean_text')
             senti_scores = senti_analyzer.polarity_scores(test)
-            twitter_vader_score.append(senti_scores['compound'])
         #감정 분석 부분 
-            self.twitter_data.loc[i,'vader'] = twitter_vader_score[i]
+            self.twitter_data._set_value(i,'vader',senti_scores['compound'])
         #감정 분석 점수 데이터프레임에 추가
         print("vader sentimental time : ",time.time()-start)
     #플레어 감정분석기
