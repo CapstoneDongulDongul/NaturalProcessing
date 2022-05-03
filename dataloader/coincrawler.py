@@ -12,24 +12,15 @@ driver = webdriver.Chrome('C:/Users/epicl/Documents/chdr/chromedriver.exe')
 
 url = f'https://coinmarketcap.com/currencies/{title}/historical-data/'
 driver.get(url)
-# /table/tbody/tr/td
-# element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "sc-16r8icm-0 jKrmxw container")))
-# try:
-#   element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "/table/tbody/tr/td")))
-# finally:
-#   driver.quit()
+
 driver.implicitly_wait(time_to_wait=10) # 로딩이 될때까지 대기  
 time.sleep(random.uniform(2,4)) # 로봇으로 인식하지 않도록 랜덤값으로 기다리기
-# html = driver.page_source
-# soup = BeautifulSoup(html, 'lxml')
 
 
 scroll_loaction = driver.execute_script("return document.body.scrollHeight")  # 현재 스크롤 위치
 
 while True:
   driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
-  # /body/div/div/div/div[1]/div/div[2]/div/div/p/button
-  # driver.find_element_by_class_name('x0o17e-0 DChGS').click()
   bt = driver.find_element_by_xpath("//button[contains(text(),'Load More')]") # 불러오기 버튼의 요소를 가져온다
   bt.click()  # 불러오기 버튼 클릭
 

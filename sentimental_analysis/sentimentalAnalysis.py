@@ -1,4 +1,4 @@
-\import nltk
+import nltk
 import re
 import pandas as pd
 import numpy as np
