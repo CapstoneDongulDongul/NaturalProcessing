@@ -51,9 +51,11 @@ class sentimental_analysis:
                 self.twitter_data._set_value(i,'clean_text','000')
             else:
                 self.twitter_data._set_value(i,'clean_text',text)
-        self.twitter_data['vader'] = np.NaN
-        self.twitter_data['textblob'] = np.NaN
-        self.twitter_data['flair'] = np.NaN
+        if option == 'textblob':
+            self.twitter_data['textblob'] = np.NaN
+        else : 
+            self.twitter_data['vader'] = np.NaN
+            self.twitter_data['flair'] = np.NaN
         print("process time : ",time.time()-start)
     def sentimental_Textblob(self):
         start=time.time()
