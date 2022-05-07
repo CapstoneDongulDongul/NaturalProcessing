@@ -32,42 +32,25 @@ class sentimental_analysis:
         korean = re.compile('[\u3131-\u3163\uac00-\ud7a3]+')
         clean_tweet = []
         tweet = self.twitter_data
-        if option == 'textblob':
-             for i in tweet.index:
-                t = tweet._get_value(i,'tweet')
-                tweet_list_corpus = re.sub(korean, '', str(t))
-                # URL 제거
-                clear_text = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",repl= ' ', string = tweet_list_corpus) # http로 시작되는 url
-                clear_text = clear_text.replace('\n',' ').replace('\t',' ')
-                clear_text = re.sub('RT @[\w_]+: ',' ', clear_text)
-                # Hashtag 제거
-                clear_text = re.sub('[#]+[0-9a-zA-Z_]+', ' ', clear_text)
+        for i in tweet.index:
+            t = tweet._get_value(i,'tweet')
+            tweet_list_corpus = re.sub(korean, '', str(t))
+            clear_text = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",repl= ' ', string = tweet_list_corpus) # http로 시작되는 url
+            clear_text = clear_text.replace('\n',' ').replace('\t',' ')
+            clear_text = re.sub('RT @[\w_]+: ',' ', clear_text)
+            # Hashtag 제거
+            clear_text = re.sub('[#]+[0-9a-zA-Z_]+', ' ', clear_text)
+            clear_text = re.sub('@','',clear_text)
+            if option == 'textblob':
                 clear_text = clear_text.lower()
-                word_list = tweet_tokenizer.tokenize(clear_text)
-                word_list = [word for word in word_list if word not in stop_words]
-                word_list = [stemmer.stem(word) for word in word_list]
-                text = ' '.join(word_list)
-                if len(text) == 0:
-                    self.twitter_data._set_value(i,'clean_text','0')
-                else:
-                    self.twitter_data._set_value(i,'clean_text',text)
-        elif option == 'vader' or option =='flair':
-            for i in tweet.index:
-                t = tweet._get_value(i,'tweet')
-                tweet_list_corpus = re.sub(korean, '', str(t))
-                clear_text = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",repl= ' ', string = tweet_list_corpus) # http로 시작되는 url
-                clear_text = clear_text.replace('\n',' ').replace('\t',' ')
-                clear_text = re.sub('RT @[\w_]+: ',' ', clear_text)
-                # Hashtag 제거
-                clear_text = re.sub('[#]+[0-9a-zA-Z_]+', ' ', clear_text)
-                word_list = tweet_tokenizer.tokenize(clear_text)
-                word_list = [word for word in word_list if word not in stop_words]
-                word_list = [stemmer.stem(word) for word in word_list]
-                text = ' '.join(word_list)
-                if len(text) == 0:
-                    self.twitter_data._set_value(i,'clean_text','0')
-                else:
-                    self.twitter_data._set_value(i,'clean_text',text)
+            word_list = tweet_tokenizer.tokenize(clear_text)
+            word_list = [word for word in word_list if word not in stop_words]
+            word_list = [stemmer.stem(word) for word in word_list]
+            text = ' '.join(word_list)
+            if not text or text == np.NaN:
+                self.twitter_data._set_value(i,'clean_text','000')
+            else:
+                self.twitter_data._set_value(i,'clean_text',text)
         self.twitter_data['vader'] = np.NaN
         self.twitter_data['textblob'] = np.NaN
         self.twitter_data['flair'] = np.NaN
@@ -80,6 +63,8 @@ class sentimental_analysis:
         for i in range(len(text_list)):
             blob = TextBlob(str(text_list[i]))
             for sentence in blob.sentences:
+                if sentence == np.NaN:
+                    sentece = '000'
                 twitter_textblob_score.append(sentence.sentiment.polarity)
                 self.twitter_data.loc[i,'textblob'] = twitter_textblob_score[i]
         print("textblob sentimental time : ",time.time()-start)
