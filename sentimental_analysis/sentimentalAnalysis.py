@@ -47,12 +47,12 @@ class sentimental_analysis:
             word_list = [word for word in word_list if word not in stop_words]
             word_list = [stemmer.stem(word) for word in word_list]
             text = ' '.join(word_list)
-            if (not text == True) or (text == np.NaN):
+            if text == "":
                 self.twitter_data._set_value(i,'clean_text',np.NaN)
             else:
                 self.twitter_data._set_value(i,'clean_text',text)
-        
         self.twitter_data.dropna(axis=0)
+        
         if option == 'textblob':
             self.twitter_data['textblob'] = np.NaN
         elif option == 'vader' or option == 'flair':   
@@ -72,11 +72,10 @@ class sentimental_analysis:
     def sentimental_vader(self):                    
         start = time.time()
         #전처리된 csv파일 다시 reload
-        text_list = self.twitter_data['clean_text']
         senti_analyzer = SentimentIntensityAnalyzer()
         for i in self.twitter_data.index:
             tweet_data = self.twitter_data._get_value(i,'clean_text')
-            senti_scores = senti_analyzer.polarity_scores(tweet_data)
+            senti_scores = senti_analyzer.polarity_scores(str(tweet_data))
         #감정 분석 부분 
             self.twitter_data._set_value(i,'vader',senti_scores['compound'])
         #감정 분석 점수 데이터프레임에 추가
@@ -88,13 +87,14 @@ class sentimental_analysis:
         text_list = self.twitter_data['clean_text']
 
         for i in self.twitter_data.index:
-            sentence = Sentence(self.twitter_data._get_value(i,'clean_text'))
+            text = str(self.twitter_data._get_value(i,'clean_text'))
+            sentence = Sentence(text)
             senti_analyzer.predict(sentence)
             total_sen = sentence.labels[0]
             sign = 1 if total_sen.value == 'POSITIVE' else -1
             score = total_sen.score
             f_score = score*sign
-            self.twitter_data._set_value(i,'vader',f_score)
+            self.twitter_data._set_value(i,'flair',f_score)
         print("flair sentimental time : ",time.time()-start)
     #감정분석 완료 이후 save함수를 통해서 데이터프레임 csv로 저장
     
