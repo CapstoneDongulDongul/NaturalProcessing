@@ -61,10 +61,9 @@ class sentimental_analysis:
         print("process time : ",time.time()-start)
     def sentimental_Textblob(self):
         start=time.time()
-        text_list = self.twitter_data['clean_text']
         for i in self.twitter_data.index:
             tweet_data = self.twitter_data._get_value(i,'clean_text')
-            blob = TextBlob(tweet_data)
+            blob = TextBlob(str(tweet_data))
             #감정 분석 부분
             for sentence in blob.sentences:
                 self.twitter_data._set_value(i,'textblob',sentence.sentiment.polarity) 
