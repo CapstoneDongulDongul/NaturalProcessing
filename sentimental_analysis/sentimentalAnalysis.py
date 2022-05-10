@@ -326,6 +326,4 @@ coin_tweet.process('vader')
 coin_tweet.sentimental_vader()
 coin_tweet.sentimental_flair()
 coin_tweet.save_csv()
-
-모듈 사용 예시 소스코드
 """
