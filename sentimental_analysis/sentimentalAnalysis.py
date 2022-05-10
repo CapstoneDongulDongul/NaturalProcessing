@@ -50,9 +50,7 @@ class sentimental_analysis:
             if text == "":
                 self.twitter_data._set_value(i,'clean_text',np.NaN)
             else:
-                self.twitter_data._set_value(i,'clean_text',text)
-        self.twitter_data.dropna(axis=0)
-        
+                self.twitter_data._set_value(i,'clean_text',text)    
         if option == 'textblob':
             self.twitter_data['textblob'] = np.NaN
         elif option == 'vader' or option == 'flair':   
