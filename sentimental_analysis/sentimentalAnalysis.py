@@ -47,39 +47,32 @@ class sentimental_analysis:
             word_list = [word for word in word_list if word not in stop_words]
             word_list = [stemmer.stem(word) for word in word_list]
             text = ' '.join(word_list)
-            if not text or text == np.NaN:
-                self.twitter_data._set_value(i,'clean_text','000')
+            if text == "":
+                self.twitter_data._set_value(i,'clean_text',np.NaN)
             else:
-                self.twitter_data._set_value(i,'clean_text',text)
+                self.twitter_data._set_value(i,'clean_text',text)    
         if option == 'textblob':
             self.twitter_data['textblob'] = np.NaN
-        else : 
+        elif option == 'vader' or option == 'flair':   
             self.twitter_data['vader'] = np.NaN
             self.twitter_data['flair'] = np.NaN
         print("process time : ",time.time()-start)
     def sentimental_Textblob(self):
         start=time.time()
-        result_tweet = self.twitter_data
-        text_list = list(result_tweet['clean_text'])
-        twitter_textblob_score = []
-        for i in range(len(text_list)):
-            blob = TextBlob(str(text_list[i]))
+        for i in self.twitter_data.index:
+            tweet_data = self.twitter_data._get_value(i,'clean_text')
+            blob = TextBlob(str(tweet_data))
+            #감정 분석 부분
             for sentence in blob.sentences:
-                if sentence == np.NaN:
-                    sentece = '000'
-                twitter_textblob_score.append(sentence.sentiment.polarity)
-                self.twitter_data.loc[i,'textblob'] = twitter_textblob_score[i]
+                self.twitter_data._set_value(i,'textblob',sentence.sentiment.polarity) 
         print("textblob sentimental time : ",time.time()-start)
     def sentimental_vader(self):                    
         start = time.time()
-        result_tweet = self.twitter_data
         #전처리된 csv파일 다시 reload
-        text_list = result_tweet['clean_text']
         senti_analyzer = SentimentIntensityAnalyzer()
-        twitter_vader_score = []
-        for i in result_tweet.index:
-            test = result_tweet._get_value(i,'clean_text')
-            senti_scores = senti_analyzer.polarity_scores(test)
+        for i in self.twitter_data.index:
+            tweet_data = self.twitter_data._get_value(i,'clean_text')
+            senti_scores = senti_analyzer.polarity_scores(str(tweet_data))
         #감정 분석 부분 
             self.twitter_data._set_value(i,'vader',senti_scores['compound'])
         #감정 분석 점수 데이터프레임에 추가
@@ -87,23 +80,21 @@ class sentimental_analysis:
     #플레어 감정분석기
     def sentimental_flair(self):
         start = time.time()
-        senti_analyzer = TextClassifier.load('en-sentiment')
-        result_tweet = self.twitter_data
-        text_list = result_tweet['clean_text']
-        n = (len(text_list))
-        twitter_flair_score = []
-        i = 0
-        for i in range(0,n):
-            sentence = Sentence(str(text_list[i]))
+        senti_analyzer = TextClassifier.load('en-sentiment')       
+        text_list = self.twitter_data['clean_text']
+
+        for i in self.twitter_data.index:
+            text = str(self.twitter_data._get_value(i,'clean_text'))
+            sentence = Sentence(text)
             senti_analyzer.predict(sentence)
             total_sen = sentence.labels[0]
             sign = 1 if total_sen.value == 'POSITIVE' else -1
             score = total_sen.score
             f_score = score*sign
-            twitter_flair_score.append(f_score)
-            self.twitter_data.loc[i,'flair'] = twitter_flair_score[i]
+            self.twitter_data._set_value(i,'flair',f_score)
         print("flair sentimental time : ",time.time()-start)
     #감정분석 완료 이후 save함수를 통해서 데이터프레임 csv로 저장
+    
     def save_csv(self):
         self.twitter_data.to_csv('senti_tweet.csv',mode = 'w')        
             #sentence 클래스 학습 이후 점수만 추출 예정
