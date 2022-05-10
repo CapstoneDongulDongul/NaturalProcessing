@@ -11,8 +11,206 @@ from textblob import TextBlob
 from flair.models import TextClassifier
 from flair.data import Sentence
 import time
-#라이브러리 선언부
+import itertools
 
+#라이브러리 선언부
+def load_dict_contractions():
+    return {
+        "ain't":"is not",
+        "amn't":"am not",
+        "aren't":"are not",
+        "can't":"cannot",
+        "'cause":"because",
+        "couldn't":"could not",
+        "couldn't've":"could not have",
+        "could've":"could have",
+        "daren't":"dare not",
+        "daresn't":"dare not",
+        "dasn't":"dare not",
+        "didn't":"did not",
+        "doesn't":"does not",
+        "don't":"do not",
+        "e'er":"ever",
+        "em":"them",
+        "everyone's":"everyone is",
+        "finna":"fixing to",
+        "gimme":"give me",
+        "gonna":"going to",
+        "gon't":"go not",
+        "gotta":"got to",
+        "hadn't":"had not",
+        "hasn't":"has not",
+        "haven't":"have not",
+        "he'd":"he would",
+        "he'll":"he will",
+        "he's":"he is",
+        "he've":"he have",
+        "how'd":"how would",
+        "how'll":"how will",
+        "how're":"how are",
+        "how's":"how is",
+        "I'd":"I would",
+        "I'll":"I will",
+        "I'm":"I am",
+        "I'm'a":"I am about to",
+        "I'm'o":"I am going to",
+        "isn't":"is not",
+        "it'd":"it would",
+        "it'll":"it will",
+        "it's":"it is",
+        "I've":"I have",
+        "kinda":"kind of",
+        "let's":"let us",
+        "mayn't":"may not",
+        "may've":"may have",
+        "mightn't":"might not",
+        "might've":"might have",
+        "mustn't":"must not",
+        "mustn't've":"must not have",
+        "must've":"must have",
+        "needn't":"need not",
+        "ne'er":"never",
+        "o'":"of",
+        "o'er":"over",
+        "ol'":"old",
+        "oughtn't":"ought not",
+        "shalln't":"shall not",
+        "shan't":"shall not",
+        "she'd":"she would",
+        "she'll":"she will",
+        "she's":"she is",
+        "shouldn't":"should not",
+        "shouldn't've":"should not have",
+        "should've":"should have",
+        "somebody's":"somebody is",
+        "someone's":"someone is",
+        "something's":"something is",
+        "that'd":"that would",
+        "that'll":"that will",
+        "that're":"that are",
+        "that's":"that is",
+        "there'd":"there would",
+        "there'll":"there will",
+        "there're":"there are",
+        "there's":"there is",
+        "these're":"these are",
+        "they'd":"they would",
+        "they'll":"they will",
+        "they're":"they are",
+        "they've":"they have",
+        "this's":"this is",
+        "those're":"those are",
+        "'tis":"it is",
+        "'twas":"it was",
+        "wanna":"want to",
+        "wasn't":"was not",
+        "we'd":"we would",
+        "we'd've":"we would have",
+        "we'll":"we will",
+        "we're":"we are",
+        "weren't":"were not",
+        "we've":"we have",
+        "what'd":"what did",
+        "what'll":"what will",
+        "what're":"what are",
+        "what's":"what is",
+        "what've":"what have",
+        "when's":"when is",
+        "where'd":"where did",
+        "where're":"where are",
+        "where's":"where is",
+        "where've":"where have",
+        "which's":"which is",
+        "who'd":"who would",
+        "who'd've":"who would have",
+        "who'll":"who will",
+        "who're":"who are",
+        "who's":"who is",
+        "who've":"who have",
+        "why'd":"why did",
+        "why're":"why are",
+        "why's":"why is",
+        "won't":"will not",
+        "wouldn't":"would not",
+        "would've":"would have",
+        "y'all":"you all",
+        "you'd":"you would",
+        "you'll":"you will",
+        "you're":"you are",
+        "you've":"you have",
+        "Whatcha":"What are you",
+        "luv":"love",
+        "sux":"sucks"
+        }
+
+def load_dict_smileys(): 
+    return {
+        ":‑)":"smiley",
+        ":-]":"smiley",
+        ":-3":"smiley",
+        ":->":"smiley",
+        "8-)":"smiley",
+        ":-}":"smiley",
+        ":)":"smiley",
+        ":]":"smiley",
+        ":3":"smiley",
+        ":>":"smiley",
+        "8)":"smiley",
+        ":}":"smiley",
+        ":o)":"smiley",
+        ":c)":"smiley",
+        ":^)":"smiley",
+        "=]":"smiley",
+        "=)":"smiley",
+        ":-))":"smiley",
+        ":‑D":"smiley",
+        "8‑D":"smiley",
+        "x‑D":"smiley",
+        "X‑D":"smiley",
+        ":D":"smiley",
+        "8D":"smiley",
+        "xD":"smiley",
+        "XD":"smiley",
+        ":‑(":"sad",
+        ":‑c":"sad",
+        ":‑<":"sad",
+        ":‑[":"sad",
+        ":(":"sad",
+        ":c":"sad",
+        ":<":"sad",
+        ":[":"sad",
+        ":-||":"sad",
+        ">:[":"sad",
+        ":{":"sad",
+        ":@":"sad",
+        ">:(":"sad",
+        ":'‑(":"sad",
+        ":'(":"sad",
+        ":‑P":"playful",
+        "X‑P":"playful",
+        "x‑p":"playful",
+        ":‑p":"playful",
+        ":‑Þ":"playful",
+        ":‑þ":"playful",
+        ":‑b":"playful",
+        ":P":"playful",
+        "XP":"playful",
+        "xp":"playful",
+        ":p":"playful",
+        ":Þ":"playful",
+        ":þ":"playful",
+        ":b":"playful",
+        "<3":"love"
+        }
+ 
+def strip_accents(text):
+    if 'ø' in text or  'Ø' in text:
+        return text   
+    text = text.encode('ascii', 'ignore')
+    text = text.decode("utf-8")
+    return str(text)
+
+    
 stop_words = stopwords.words('english')
 stemmer = PorterStemmer()
 tweet_tokenizer = TweetTokenizer()
@@ -38,14 +236,33 @@ class sentimental_analysis:
             clear_text = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",repl= ' ', string = tweet_list_corpus) # http로 시작되는 url
             clear_text = clear_text.replace('\n',' ').replace('\t',' ')
             clear_text = re.sub('RT @[\w_]+: ',' ', clear_text)
-            # Hashtag 제거
-            clear_text = re.sub('[#]+[0-9a-zA-Z_]+', ' ', clear_text)
-            clear_text = re.sub('@','',clear_text)
+            #한글, 주소, 엔터키, 리트윗 삭제
+            clear_text = ' '.join(re.sub("(@[A-Za-z0-9]+)|(#[A-Za-z0-9]+)", " ", clear_text).split())
+            clear_text = ' '.join(re.sub("(\w+:\/\/\S+)", " ", clear_text).split())
+            clear_text = ' '.join(re.sub("[\.\,\!\?\:\;\-\=]", " ", clear_text).split())
+            #해쉬태그 및 태그 , 주소, 구두점 제거
+            CONTRACTIONS = load_dict_contractions()
+            clear_text = clear_text.replace("’","'")
+            words = clear_text.split()
+            reformed = [CONTRACTIONS[word] if word in CONTRACTIONS else word for word in words]
+            clear_text = " ".join(reformed)
+            clear_text = ''.join(''.join(s)[:2] for _, s in itertools.groupby(clear_text))
+            #영어 표현 정규화, 단어 그룹핑을통한 정규화
+            
+            SMILEY = load_dict_smileys()  
+            words = clear_text.split()
+            reformed = [SMILEY[word] if word in SMILEY else word for word in words]
+            clear_text = " ".join(reformed)
+            #이모티콘 텍스트화
+            
+            clear_text = strip_accents(clear_text)
+            clear_text = clear_text.replace(":"," ")
+            clear_text = ' '.join(clear_text.split())
+                    
             if option == 'textblob':
                 clear_text = clear_text.lower()
+            
             word_list = tweet_tokenizer.tokenize(clear_text)
-            word_list = [word for word in word_list if word not in stop_words]
-            word_list = [stemmer.stem(word) for word in word_list]
             text = ' '.join(word_list)
             if text == "":
                 self.twitter_data._set_value(i,'clean_text',np.NaN)
