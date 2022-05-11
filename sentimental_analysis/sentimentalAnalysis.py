@@ -269,7 +269,6 @@ class sentimental_analysis:
             else:
                 self.twitter_data._set_value(i,'clean_text',text)
         self.twitter_data.dropna(axis=0)
-        
         if option == 'textblob':
             self.twitter_data['textblob'] = np.NaN
         elif option == 'vader' or option == 'flair':   
@@ -320,6 +319,7 @@ class sentimental_analysis:
             
             
 """
+예시 코드
 bitcoin = pd.read_table("bitcoin_2022-04-14.txt",sep=",")
 coin_tweet = sentimental_analysis(bitcoin)
 coin_tweet.process('vader')
