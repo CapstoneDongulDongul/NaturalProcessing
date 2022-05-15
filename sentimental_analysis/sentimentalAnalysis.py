@@ -261,7 +261,10 @@ class sentimental_analysis:
             words = clear_text.split()
             reformed = [SMILEY[word] if word in SMILEY else word for word in words]
             clear_text = " ".join(reformed)
-            #이모티콘 텍스트
+            #이모티콘 텍스트화
+            clear_text = strip_accents(clear_text)
+            clear_text = clear_text.replace(":"," ")
+            clear_text = ' '.join(clear_text.split())
             if option == 'textblob':
                 clear_text = clear_text.lower()
             
