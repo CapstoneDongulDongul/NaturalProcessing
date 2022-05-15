@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+import chromedriver_autoinstaller
 import time
 import random
 import pandas as pd
@@ -23,9 +24,8 @@ class coin_crawl_his:
 
   # chromedriver 자동 설치 밎 실행을 위한 코드
   def startDriver(self):    
-    chrome_driver = ChromeDriverManager().install()
-    service = Service(chrome_driver)
-    self.driver = webdriver.Chrome(service = service)  
+    chromedriver_autoinstaller.install()
+    self.driver = webdriver.Chrome()
     
     url = f'https://coinmarketcap.com/currencies/{self.title}/historical-data/'
     self.driver.get(url)
@@ -41,7 +41,7 @@ class coin_crawl_his:
       self.driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
 
       bt = self.driver.find_element_by_xpath("//button[contains(text(),'Load More')]") # 불러오기 버튼의 요소를 가져온다
-      bt.click()  # 불러오기 버튼 클릭
+      self.driver.execute_script("arguments[0].click();",bt)
 
       self.driver.implicitly_wait(time_to_wait=10) # 로딩 대기
       time.sleep(2) # 버튼이 불러와지지 않는 것을 대비하여 sleep  
