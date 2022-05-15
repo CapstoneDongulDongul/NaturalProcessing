@@ -221,8 +221,11 @@ class sentimental_analysis:
     #데이터프레임을 입력받아 클래스초기화
     def __init__(self,twitter_data):
         self.twitter_data = twitter_data
-        self.twitter_data = self.twitter_data[['date','tweet']]
-        self.twitter_data['clean_text'] = np.NaN
+        if not('clean_text' in twitter_data.columns) : 
+            self.twitter_data['clean_text'] = np.NaN
+            self.twitter_data = self.twitter_data[['date','tweet']]
+        else : 
+            self.twitter_data = self.twitter_data[['date','tweet','clean_text']]
 
     #vader,textblob,flair 옵션 입력
     def process(self,option): 
@@ -324,8 +327,8 @@ class sentimental_analysis:
 bitcoin = pd.read_table("bitcoin_2022-04-14.txt",sep=",")
 coin_tweet = sentimental_analysis(bitcoin)
 coin_tweet.process('vader')
-coin_tweet.sentimental_vader()
-coin_tweet.sentimental_flair()
+coin_tweet.sentimental_with_vader()
+coin_tweet.sentimental__with_flair()
 coin_tweet.save_csv()
 
 모듈 사용 예시 소스코드
