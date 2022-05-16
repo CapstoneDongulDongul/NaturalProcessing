@@ -9,6 +9,7 @@ class data_concat :
         for i in range(1,len(files)):
             self.result = pd.concat([self.result, files[i]], axis=0)
         self.result=self.result.drop_duplicates()
+        self.result.reset_index(drop=True)
         return self.result
 
     def save_csv(self, file_name):
