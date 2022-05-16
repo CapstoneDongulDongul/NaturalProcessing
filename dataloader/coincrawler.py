@@ -53,7 +53,7 @@ class coin_crawl_his:
     self.trs = soup.select('tr > td')
     
     # col명 - date, open, high, low, close, vol, marcket cap
-    col = ['date', 'open', 'high', 'low', 'close', 'vol', 'marcket cap']
+    col = ['date', 'open', 'high', 'low', 'close', 'vol', 'market cap']
 
     # dataframe을 위한 형식 - dictionary 이용
     data = {
@@ -63,7 +63,7 @@ class coin_crawl_his:
       'low' : [],
       'close' : [],
       'vol' : [],
-      'marcket cap' : []
+      'market cap' : []
     }
 
     n = 0
