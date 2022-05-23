@@ -28,6 +28,6 @@ class tweepy_coin_crawler:
             
         return file_name +" file uploaded"
 
-    def tweepy_connect(self):
+    def tweepy_disconnect(self):
         self.api = None
     

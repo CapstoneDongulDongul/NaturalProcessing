@@ -1,0 +1,17 @@
+import pandas as pd
+import tqdm
+
+class data_concat : 
+    def __init__(self):
+        self.result = None
+
+    def concat(self, files):
+        self.result=files[0]
+        for i in tqdm.notebook.tqdm(range(1,len(files))):
+            self.result = pd.concat([self.result, files[i]], axis=0)
+        self.result=self.result.drop_duplicates()
+        self.result = self.result.reset_index(drop=True)
+        return self.result
+
+    def save_csv(self, file_name):
+        self.result.to_csv(file_name+'.csv',mode = 'w') 
