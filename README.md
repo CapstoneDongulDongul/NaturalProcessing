@@ -8,10 +8,14 @@ Natural Process Algorithms for gree/fear analysis and database
 
 ![image](https://user-images.githubusercontent.com/81630351/169848576-5a5243cc-0012-4270-bf57-44cbd8a1a9e8.png)
 ![image](https://user-images.githubusercontent.com/81630351/169848602-7aa76de5-ae73-4c1b-8ef0-23dda7eda8cd.png)
+
+
 <Twitter 크롤러 API과 크롤링한 데이터>
 
 ![image](https://user-images.githubusercontent.com/81630351/169848803-f5f24a74-a690-4829-8aba-0bd1ecda94db.png)
 ![image](https://user-images.githubusercontent.com/81630351/169848827-cd142f39-d1c5-4465-b3dc-397e0ed2e116.png)
+
+
 <Coin Price Crawler API와 크롤링한 데이터(우측)>
 
 ## 2. 자연어처리 및 감성분석 모듈(자연어처리-감성분석 파이프라인)
